@@ -33,23 +33,19 @@ class PokemonListFragment : Fragment() {
         )
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
+
+        viewModel = ViewModelProvider(this).get(PokemonListViewModel::class.java)
+
+        viewModel.pokemonList.observe(viewLifecycleOwner, {
+            adapter.pokemonList = it
+        })
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launchWhenStarted {
-            PokeApi.retrofitService.getPokemon().body()?.let {
-                adapter.pokemonList = it.results
-            }
-        }
+        viewModel.onViewCreated()
     }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(PokemonListViewModel::class.java)
-        // TODO: Use the ViewModel
-    }
-
 }
